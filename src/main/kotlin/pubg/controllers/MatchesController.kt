@@ -12,7 +12,6 @@ class MatchesController @Inject constructor(private val pubgApiService: PubgApiS
 
     @Get("/{matchId}")
     fun show(matchId: String): Maybe<MatchResponse> {
-
         return this.pubgApiService.match(matchId)
     }
 

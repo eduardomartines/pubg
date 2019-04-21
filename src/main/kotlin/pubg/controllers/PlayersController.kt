@@ -12,7 +12,6 @@ class PlayersController @Inject constructor(private val pubgApiService: PubgApiS
 
     @Get
     fun list(playerNames: List<String>): Maybe<PlayersResponse> {
-
         return this.pubgApiService.players(playerNames)
     }
 
