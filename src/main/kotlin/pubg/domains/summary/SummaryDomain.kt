@@ -18,15 +18,16 @@ class SummaryDomain @Inject constructor(private val pubgApiService: PubgApiServi
         limitByMatchCount: Int?
     ): SummaryResult {
         var apiCallCount = 0
+        var playerParticipantId = ""
 
         val playersResult = this.pubgApiService.players(playerNames).blockingGet()
         apiCallCount += 1
 
-        val result = SummaryResult(playerKillCount = 0)
+        val summaryResult = SummaryResult()
         val matchIds: MutableList<String> = ArrayList()
 
         for (playerData in playersResult.data) {
-            result.playerAccountId = playerData.id
+            summaryResult.playerAccountId = playerData.id!!
 
             for (matchData in playerData.relationships.matches.data) {
                 matchIds.add(matchData.id!!)
@@ -35,12 +36,12 @@ class SummaryDomain @Inject constructor(private val pubgApiService: PubgApiServi
 
         for (matchId in matchIds) {
 
-            if (limitByMatchCount != null && limitByMatchCount == result.matchIds.size) {
+            if (limitByMatchCount != null && limitByMatchCount == summaryResult.matchesIds.size) {
                 break
             }
 
-            if (limitByDaysCount != null && result.matchStartTimestamps.size != 0) {
-                val dayOfMonth = result.matchStartTimestamps.last().dayOfMonth
+            if (limitByDaysCount != null && summaryResult.matchesStartTimestamps.size != 0) {
+                val dayOfMonth = summaryResult.matchesStartTimestamps.last().dayOfMonth
                 val todayDayOfMouth = ZonedDateTime.now().dayOfMonth
                 val diff = (todayDayOfMouth - dayOfMonth).absoluteValue
 
@@ -49,7 +50,7 @@ class SummaryDomain @Inject constructor(private val pubgApiService: PubgApiServi
                 }
             }
 
-            result.matchIds.add(matchId)
+            summaryResult.matchesIds.add(matchId)
 
             val matchResult = this.pubgApiService.match(matchId).blockingGet()
             apiCallCount += 1
@@ -58,28 +59,55 @@ class SummaryDomain @Inject constructor(private val pubgApiService: PubgApiServi
                 val date = matchData.attributes.createdAt
                 val parsedDate = ZonedDateTime.parse(date, DateTimeFormatter.ISO_ZONED_DATE_TIME)
 
-                result.matchStartTimestamps.add(parsedDate)
-                result.matchStartFormattedTimestamps.add(
+                summaryResult.matchesStartTimestamps.add(parsedDate)
+                summaryResult.matchesStartFormattedTimestamps.add(
                     DateTimeFormatter.ofPattern(TIMESTAMP_FORMAT).format(parsedDate)
                 )
+                summaryResult.matchesMapNames.add(matchData.attributes.mapName!!)
+                summaryResult.matchesGameModes.add(matchData.attributes.gameMode!!)
             }
 
             for (matchIncludedData in matchResult.included) {
-                val stats = matchIncludedData.attributes.stats ?: continue
-
-                if (stats.kills == null || stats.playerId != result.playerAccountId) {
+                if (matchIncludedData.type != "participant") {
                     continue
                 }
 
+                val stats = matchIncludedData.attributes.stats
+
+                if (stats!!.playerId != summaryResult.playerAccountId) {
+                    continue
+                }
+
+                playerParticipantId = matchIncludedData.id!!
+
                 val killCount = stats.kills!!.toInt()
 
-                result.matchKills.add(killCount)
-                result.playerKillCount = result.playerKillCount!! + killCount
+                summaryResult.matchesKills.add(killCount)
+                summaryResult.playerKillCount = summaryResult.playerKillCount + killCount
+            }
+
+            for (matchIncludedData in matchResult.included) {
+                if (matchIncludedData.type == "roster") {
+
+                    for (data in matchIncludedData.relationships!!.participants!!.data!!) {
+                        if (data.id != playerParticipantId) {
+                            continue
+                        }
+
+                        if (matchIncludedData.attributes.won == "true") {
+                            summaryResult.matchesWon.add(1)
+                        } else {
+                            summaryResult.matchesWon.add(0)
+                        }
+
+                        summaryResult.matchesRanks.add(matchIncludedData.attributes.stats!!.rank!!)
+                    }
+                }
             }
         }
 
-        result.apiCallCount = apiCallCount
+        summaryResult._apiCallCount = apiCallCount
 
-        return result
+        return summaryResult
     }
 }

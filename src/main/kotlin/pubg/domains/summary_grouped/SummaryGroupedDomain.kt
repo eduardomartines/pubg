@@ -13,39 +13,70 @@ class SummaryGroupedDomain @Inject constructor(private val summaryDomain: Summar
         enum class GroupByOptions{
             BY_DAYS_COUNT
         }
+
+        enum class FilterByMatchGameModeOptions(val value: String){
+            SQUAD_FPP("squad-fpp")
+        }
     }
 
     fun perform(
         playerNames: List<String>,
         groupBy: String,
         limitByDaysCount: Int?,
-        limitByMatchCount: Int?
+        limitByMatchCount: Int?,
+        filterByMatchGameMode: String?
     ): SummaryGroupedResult {
         val groupByOption = GroupByOptions.valueOf(groupBy)
-        val summary = this.summaryDomain.perform(playerNames, limitByDaysCount, limitByMatchCount)
+
+        var filterByMatchGameModeOption: String? = null
+
+        if (filterByMatchGameMode != null) {
+            filterByMatchGameModeOption = FilterByMatchGameModeOptions.valueOf(
+                filterByMatchGameMode
+            ).value
+        }
+
+        val summaryResult = this.summaryDomain.perform(
+            playerNames,
+            limitByDaysCount,
+            limitByMatchCount
+        )
+
         val data: MutableList<SummaryGroupedDataResult> = ArrayList()
         var totalMatchCount = 0
         var totalPlayerKillsCount = 0
 
         for (dayIndex in (limitByDaysCount!!.toInt() - 1) downTo 0) {
-            val nSummaryResult = SummaryResult(playerKillCount = 0)
+            val dayIndexSummaryResult = SummaryResult()
 
-            for (index in summary.matchIds.lastIndex downTo 0) {
+            for (index in summaryResult.matchesIds.lastIndex downTo 0) {
                 val dayIndexFromToday = (
-                    summary.matchStartTimestamps[index].dayOfMonth - ZonedDateTime.now().dayOfMonth
+                    summaryResult.matchesStartTimestamps[index].dayOfMonth
+                        - ZonedDateTime.now().dayOfMonth
                 ).absoluteValue
 
                 if (dayIndexFromToday == dayIndex) {
-                    val matchKills = summary.matchKills[index]
+                    val matchKills = summaryResult.matchesKills[index]
 
                     totalMatchCount += 1
                     totalPlayerKillsCount += matchKills
 
-                    nSummaryResult.playerKillCount = nSummaryResult.playerKillCount!! + matchKills
-                    nSummaryResult.matchKills.add(matchKills)
-                    nSummaryResult.matchIds.add(summary.matchIds[index])
-                    nSummaryResult.matchStartFormattedTimestamps.add(
-                        summary.matchStartFormattedTimestamps[index]
+                    dayIndexSummaryResult.playerKillCount += matchKills
+                    dayIndexSummaryResult.matchesKills.add(matchKills)
+                    dayIndexSummaryResult.matchesIds.add(summaryResult.matchesIds[index])
+                    dayIndexSummaryResult.matchesMapNames.add(summaryResult.matchesMapNames[index])
+                    dayIndexSummaryResult.matchesRanks.add(summaryResult.matchesRanks[index])
+                    dayIndexSummaryResult.matchesWon.add(summaryResult.matchesWon[index])
+
+                    val matchGameMode = summaryResult.matchesGameModes[index]
+
+                    if (filterByMatchGameModeOption == null ||
+                            filterByMatchGameModeOption == matchGameMode) {
+                        dayIndexSummaryResult.matchesGameModes.add(matchGameMode)
+                    }
+
+                    dayIndexSummaryResult.matchesStartFormattedTimestamps.add(
+                        summaryResult.matchesStartFormattedTimestamps[index]
                     )
                 }
             }
@@ -54,7 +85,7 @@ class SummaryGroupedDomain @Inject constructor(private val summaryDomain: Summar
                 SummaryGroupedDataResult(
                     summaryGroupedBy = groupByOption.name,
                     summaryGroupedItem = dayIndex.toString(),
-                    summaryResult = nSummaryResult
+                    summaryResult = dayIndexSummaryResult
                 )
             )
         }
@@ -62,11 +93,17 @@ class SummaryGroupedDomain @Inject constructor(private val summaryDomain: Summar
         var totalPlayerAverageKillByMatch = totalPlayerKillsCount / totalMatchCount.toDouble()
         totalPlayerAverageKillByMatch = Math.round(totalPlayerAverageKillByMatch * 100.0) / 100.0
 
+        var totalPlayerAverageRanksByMatch = summaryResult.matchesRanks.sum() /
+            totalMatchCount.toDouble()
+        totalPlayerAverageRanksByMatch = Math.round(totalPlayerAverageRanksByMatch * 100.0) / 100.0
+
         return SummaryGroupedResult(
-            _totalApiCallCount = summary.apiCallCount,
-            totalMatchesCount = totalMatchCount,
-            totalPlayerKillsCount = totalPlayerKillsCount,
-            totalPlayerAverageKillsByMatch = totalPlayerAverageKillByMatch,
+            _totalApiCallCount = summaryResult._apiCallCount!!,
+            playerMatchesCount = totalMatchCount,
+            playerKillsCount = totalPlayerKillsCount,
+            playerKillsCountAverageByMatch = totalPlayerAverageKillByMatch,
+            playerRankAverageByMatch = totalPlayerAverageRanksByMatch,
+            playerMatchesWonCount = summaryResult.matchesWon.sum(),
             data = data
         )
     }

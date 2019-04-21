@@ -15,13 +15,15 @@ class SummaryGroupedController @Inject constructor(
         playerNames: List<String>,
         groupBy: String,
         limitByDaysCount: Int?,
-        limitByMatchCount: Int?
+        limitByMatchCount: Int?,
+        filterByMatchGameMode: String?
     ): SummaryGroupedResult {
         return this.summaryGroupedDomain.perform(
             playerNames,
             groupBy,
             limitByDaysCount,
-            limitByMatchCount
+            limitByMatchCount,
+            filterByMatchGameMode
         )
     }
 }
