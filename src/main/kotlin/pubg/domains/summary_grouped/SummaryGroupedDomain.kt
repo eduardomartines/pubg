@@ -65,8 +65,13 @@ class SummaryGroupedDomain @Inject constructor(private val summaryDomain: Summar
                     dayIndexSummaryResult.matchesKills.add(matchKills)
                     dayIndexSummaryResult.matchesIds.add(summaryResult.matchesIds[index])
                     dayIndexSummaryResult.matchesMapNames.add(summaryResult.matchesMapNames[index])
-                    dayIndexSummaryResult.matchesRanks.add(summaryResult.matchesRanks[index])
                     dayIndexSummaryResult.matchesWon.add(summaryResult.matchesWon[index])
+                    dayIndexSummaryResult.matchesTeamRanks.add(
+                        summaryResult.matchesTeamRanks[index]
+                    )
+                    dayIndexSummaryResult.matchesPlayerRanks.add(
+                        summaryResult.matchesPlayerRanks[index]
+                    )
 
                     val matchGameMode = summaryResult.matchesGameModes[index]
 
@@ -90,21 +95,34 @@ class SummaryGroupedDomain @Inject constructor(private val summaryDomain: Summar
             )
         }
 
-        var totalPlayerAverageKillByMatch = totalPlayerKillsCount / totalMatchCount.toDouble()
-        totalPlayerAverageKillByMatch = Math.round(totalPlayerAverageKillByMatch * 100.0) / 100.0
+        var playerKillsCountAverageByMatch = totalPlayerKillsCount / totalMatchCount.toDouble()
+        playerKillsCountAverageByMatch = Math.round(playerKillsCountAverageByMatch * 100.0) / 100.0
 
-        var totalPlayerAverageRanksByMatch = summaryResult.matchesRanks.sum() /
+        var playerRankAverageByMatch = summaryResult.matchesPlayerRanks.sum() /
             totalMatchCount.toDouble()
-        totalPlayerAverageRanksByMatch = Math.round(totalPlayerAverageRanksByMatch * 100.0) / 100.0
+        playerRankAverageByMatch = Math.round(playerRankAverageByMatch * 100.0) / 100.0
+
+        var playerTeamRankAverageByMatch = summaryResult.matchesTeamRanks.sum() /
+            totalMatchCount.toDouble()
+        playerTeamRankAverageByMatch = Math.round(playerTeamRankAverageByMatch * 100.0) / 100.0
+
+        var playerEnemiesDamageDealt = summaryResult.matchesEnemiesDamageDealt.sum()
+        playerEnemiesDamageDealt = Math.round(playerEnemiesDamageDealt * 100.0) / 100.0
+
+        val playerEnemiesKnockedCount = summaryResult.matchesEnemiesKnockedCount.sum()
 
         return SummaryGroupedResult(
             _totalApiCallCount = summaryResult._apiCallCount!!,
             playerName = summaryResult.playerName,
             playerMatchesCount = totalMatchCount,
             playerKillsCount = totalPlayerKillsCount,
-            playerKillsCountAverageByMatch = totalPlayerAverageKillByMatch,
-            playerRankAverageByMatch = totalPlayerAverageRanksByMatch,
+            playerKillsCountAverageByMatch = playerKillsCountAverageByMatch,
+            playerRankAverageByMatch = playerRankAverageByMatch,
+            playerTeamRankAverageByMatch = playerTeamRankAverageByMatch,
             playerMatchesWonCount = summaryResult.matchesWon.sum(),
+            playerEnemiesDamageDealt = playerEnemiesDamageDealt,
+            playerEnemiesKnockedCount = playerEnemiesKnockedCount,
+            playerMissedKillsCount = totalPlayerKillsCount - playerEnemiesKnockedCount,
             data = data
         )
     }

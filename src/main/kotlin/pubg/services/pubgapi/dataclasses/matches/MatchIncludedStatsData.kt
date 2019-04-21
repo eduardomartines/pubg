@@ -3,9 +3,9 @@ package pubg.services.pubgapi.dataclasses.matches
 data class MatchIncludedStatsData(
     // participant's data
     var name: String? = null,
-    var DBNOs: String? = null,
+    var DBNOs: Int? = null,
     var assists: String? = null,
-    var damageDealt: Float? = null,
+    var damageDealt: Double? = null,
     var headshotKills: Int? = null,
     var boosts: Int? = null,
     var heals: Int? = null,

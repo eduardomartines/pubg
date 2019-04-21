@@ -82,8 +82,11 @@ class SummaryDomain @Inject constructor(private val pubgApiService: PubgApiServi
 
                 val killCount = stats.kills!!.toInt()
 
+                summaryResult.matchesEnemiesKnockedCount.add(stats.DBNOs!!)
+                summaryResult.matchesEnemiesDamageDealt.add(stats.damageDealt!!)
+                summaryResult.matchesPlayerRanks.add(stats.winPlace!!)
                 summaryResult.matchesKills.add(killCount)
-                summaryResult.playerKillCount = summaryResult.playerKillCount + killCount
+                summaryResult.playerKillCount += killCount
                 summaryResult.playerName = stats.name
             }
 
@@ -101,7 +104,9 @@ class SummaryDomain @Inject constructor(private val pubgApiService: PubgApiServi
                             summaryResult.matchesWon.add(0)
                         }
 
-                        summaryResult.matchesRanks.add(matchIncludedData.attributes.stats!!.rank!!)
+                        summaryResult.matchesTeamRanks.add(
+                            matchIncludedData.attributes.stats!!.rank!!
+                        )
                     }
                 }
             }
