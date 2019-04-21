@@ -3,7 +3,7 @@ micronaut:
     name: pubg
 
 pubg_api:
-  url: "https://api.pubg.com/shards/steam"
-  key: "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxZmRlODdjMC00NTA0LTAxMzctMThiZS0wY2JjNzc0NGZlNzMiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNTU1NzAwNzczLCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6ImF0ZV9xdWVfZm9pX2JvIn0.bvOGJtexfxDfNxza6RMaqtfSIDXPu-_PMoQG35CKohM"
-  players_url: "/players?filter[playerNames]=%s"
-  match_url: "/matches/%s"
+  url: https://api.pubg.com/shards/steam
+  key: Bearer ${PUBG_API_KEY}
+  players_url: /players?filter[playerNames]=%s
+  match_url: /matches/%s
