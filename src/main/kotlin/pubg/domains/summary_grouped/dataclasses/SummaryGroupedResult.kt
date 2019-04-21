@@ -12,5 +12,7 @@ data class SummaryGroupedResult(
     var playerKillsCountAverageByMatch: Double = 0.00,
     var playerRankAverageByMatch: Double = 0.00,
     var playerTeamRankAverageByMatch: Double = 0.00,
+    var datePeriodStart: String? = null,
+    var datePeriodEnd: String? = null,
     var data: List<SummaryGroupedDataResult>? = null
 )

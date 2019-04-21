@@ -123,6 +123,8 @@ class SummaryGroupedDomain @Inject constructor(private val summaryDomain: Summar
             playerEnemiesDamageDealt = playerEnemiesDamageDealt,
             playerEnemiesKnockedCount = playerEnemiesKnockedCount,
             playerMissedKillsCount = totalPlayerKillsCount - playerEnemiesKnockedCount,
+            datePeriodStart = summaryResult.matchesStartFormattedTimestamps.first(),
+            datePeriodEnd = summaryResult.matchesStartFormattedTimestamps.last(),
             data = data
         )
     }
