@@ -6,22 +6,19 @@ import io.micronaut.http.client.RxHttpClient
 import io.micronaut.http.client.annotation.Client
 import io.reactivex.Maybe
 import pubg.configs.PubgConfiguration
-import pubg.services.pubgapi.matches.MatchResponse
-import pubg.services.pubgapi.players.PlayersResponse
+import pubg.services.pubgapi.dataclasses.matches.MatchResponse
+import pubg.services.pubgapi.dataclasses.players.PlayersResponse
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Suppress("UNCHECKED_CAST")
 @Singleton
 class PubgApiService @Inject constructor(
-
     @Client(id = PubgConfiguration.PREFIX)
     private val httpClient: RxHttpClient,
 
     private val pubConfiguration: PubgConfiguration
-
 ) {
-
     fun players(playerNames: List<String>): Maybe<PlayersResponse> {
         val names = playerNames.joinToString(separator = ",")
 
@@ -45,5 +42,4 @@ class PubgApiService @Inject constructor(
 
         return httpClient.retrieve(request, Argument.of(responseClass)).firstElement()
     }
-
 }

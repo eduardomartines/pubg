@@ -1,4 +1,4 @@
-package pubg.services.pubgapi.matches
+package pubg.services.pubgapi.dataclasses.matches
 
 data class MatchIncludedStatsData(
     var DBNOs: String? = null,

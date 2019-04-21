@@ -1,4 +1,4 @@
-package pubg.services.pubgapi.matches
+package pubg.services.pubgapi.dataclasses.matches
 
 data class MatchResponse(
     var data: List<MatchData>,
