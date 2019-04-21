@@ -99,6 +99,7 @@ class SummaryGroupedDomain @Inject constructor(private val summaryDomain: Summar
 
         return SummaryGroupedResult(
             _totalApiCallCount = summaryResult._apiCallCount!!,
+            playerName = summaryResult.playerName,
             playerMatchesCount = totalMatchCount,
             playerKillsCount = totalPlayerKillsCount,
             playerKillsCountAverageByMatch = totalPlayerAverageKillByMatch,

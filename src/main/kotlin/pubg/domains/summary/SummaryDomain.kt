@@ -84,6 +84,7 @@ class SummaryDomain @Inject constructor(private val pubgApiService: PubgApiServi
 
                 summaryResult.matchesKills.add(killCount)
                 summaryResult.playerKillCount = summaryResult.playerKillCount + killCount
+                summaryResult.playerName = stats.name
             }
 
             for (matchIncludedData in matchResult.included) {

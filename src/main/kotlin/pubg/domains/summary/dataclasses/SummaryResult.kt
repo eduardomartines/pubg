@@ -4,7 +4,8 @@ import java.time.ZonedDateTime
 
 data class SummaryResult(
     var _apiCallCount: Int? = null,
-    var playerAccountId: String = "",
+    var playerName: String? = null,
+    var playerAccountId: String? = null,
     var playerKillCount: Int = 0,
     var matchesRanks: MutableList<Int> = ArrayList(),
     var matchesWon: MutableList<Int> = ArrayList(),

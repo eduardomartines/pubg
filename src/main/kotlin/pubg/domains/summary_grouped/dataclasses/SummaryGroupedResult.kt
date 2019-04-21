@@ -2,6 +2,7 @@ package pubg.domains.summary_grouped.dataclasses
 
 data class SummaryGroupedResult(
     var _totalApiCallCount: Int = 0,
+    var playerName: String? = null,
     var playerMatchesCount: Int = 0,
     var playerMatchesWonCount: Int = 0,
     var playerKillsCount: Int = 0,
