@@ -72,6 +72,9 @@ class SummaryGroupedDomain @Inject constructor(private val summaryDomain: Summar
                     dayIndexSummaryResult.matchesPlayerRanks.add(
                         summaryResult.matchesPlayerRanks[index]
                     )
+                    dayIndexSummaryResult.matchesFriendlyFireKills.add(
+                        summaryResult.matchesFriendlyFireKills[index]
+                    )
 
                     val matchGameMode = summaryResult.matchesGameModes[index]
 
@@ -95,8 +98,8 @@ class SummaryGroupedDomain @Inject constructor(private val summaryDomain: Summar
             )
         }
 
-        var playerKillsCountAverageByMatch = totalPlayerKillsCount / totalMatchCount.toDouble()
-        playerKillsCountAverageByMatch = Math.round(playerKillsCountAverageByMatch * 100.0) / 100.0
+        var playerKillsCountRatioByMatch = totalPlayerKillsCount / totalMatchCount.toDouble()
+        playerKillsCountRatioByMatch = Math.round(playerKillsCountRatioByMatch * 100.0) / 100.0
 
         var playerRankAverageByMatch = summaryResult.matchesPlayerRanks.sum() /
             totalMatchCount.toDouble()
@@ -111,18 +114,28 @@ class SummaryGroupedDomain @Inject constructor(private val summaryDomain: Summar
 
         val playerEnemiesKnockedCount = summaryResult.matchesEnemiesKnockedCount.sum()
 
+        val playerHeadshotKillsCount = summaryResult.matchesHeadshotKills.sum()
+
+        var playerHeadshotKillsRatio = playerHeadshotKillsCount / totalPlayerKillsCount.toDouble()
+        playerHeadshotKillsRatio = Math.round(playerHeadshotKillsRatio * 100.0) / 100.0
+
         return SummaryGroupedResult(
             _totalApiCallCount = summaryResult._apiCallCount!!,
             playerName = summaryResult.playerName,
             playerMatchesCount = totalMatchCount,
             playerKillsCount = totalPlayerKillsCount,
-            playerKillsCountAverageByMatch = playerKillsCountAverageByMatch,
+            playerHeadshotKillsCount = summaryResult.matchesHeadshotKills.sum(),
+            playerHeadshotKillsRatio = playerHeadshotKillsRatio,
+            playerKillsCountRatioByMatch = playerKillsCountRatioByMatch,
             playerRankAverageByMatch = playerRankAverageByMatch,
             playerTeamRankAverageByMatch = playerTeamRankAverageByMatch,
             playerMatchesWonCount = summaryResult.matchesWon.sum(),
             playerEnemiesDamageDealt = playerEnemiesDamageDealt,
             playerEnemiesKnockedCount = playerEnemiesKnockedCount,
             playerMissedKillsCount = totalPlayerKillsCount - playerEnemiesKnockedCount,
+            playerAssistsCount = summaryResult.matchesAssists.sum(),
+            playerRevivesCount = summaryResult.matchesRevives.sum(),
+            playerFriendlyFireKillsCount = summaryResult.matchesFriendlyFireKills.sum(),
             datePeriodStart = summaryResult.matchesStartFormattedTimestamps.first(),
             datePeriodEnd = summaryResult.matchesStartFormattedTimestamps.last(),
             data = data

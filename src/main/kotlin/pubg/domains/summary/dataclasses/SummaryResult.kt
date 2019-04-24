@@ -17,5 +17,9 @@ data class SummaryResult(
     var matchesStartFormattedTimestamps: MutableList<String> = ArrayList(),
     var matchesStartTimestamps: MutableList<ZonedDateTime> = ArrayList(),
     var matchesMapNames: MutableList<String> = ArrayList(),
-    var matchesGameModes: MutableList<String> = ArrayList()
+    var matchesGameModes: MutableList<String> = ArrayList(),
+    var matchesHeadshotKills: MutableList<Int> = ArrayList(),
+    var matchesAssists: MutableList<Int> = ArrayList(),
+    var matchesRevives: MutableList<Int> = ArrayList(),
+    var matchesFriendlyFireKills: MutableList<Int> = ArrayList()
 )
